@@ -1,0 +1,87 @@
+{
+	"name": "ug-backend-template",
+	"version": "0.0.3",
+	"type": "module",
+	"description": "NodeJS + Express + Sequelize + Databases + NodeCache template for Backends",
+	"main": "src/server.js",
+	"scripts": {
+		"test": "mocha --require test/setup-env-hook.js --file test/global-setup.js './test/**/*.test.js' --exit",
+		"cover": "c8 npm run test",
+		"lint": "eslint src/**/*.js",
+		"lint:fix": "eslint --fix src/**/*.js",
+		"format": "prettier --check \"src/**/*.js\"",
+		"format:fix": "prettier --write \"src/**/*.js\"",
+		"start": "node --env-file .env src/server.js",
+		"dev": "node --watch --trace-warnings --env-file .env.dev src/server.js",
+		"swagger": "node swagger.js"
+	},
+	"keywords": [],
+	"author": "Unknown Gravity | All-in-one Blockchain Company",
+	"license": "ISC",
+	"dependencies": {
+		"bcrypt": "^5.1.1",
+		"compression": "^1.7.4",
+		"connect-session-sequelize": "^7.1.7",
+		"cors": "^2.8.5",
+		"crypto-js": "^4.2.0",
+		"express": "^4.18.2",
+		"express-session": "^1.17.3",
+		"helmet": "^7.1.0",
+		"jsonwebtoken": "^9.0.2",
+		"mysql2": "^3.11.0",
+		"sequelize": "^6.35.2"
+	},
+	"husky": {
+		"hooks": {
+			"pre-commit": "lint-staged"
+		}
+	},
+	"lint-staged": {
+		"src/**/*.js": [
+			"npm run lint",
+			"npm run format"
+		]
+	},
+	"c8": {
+		"reporter": [
+			"html",
+			"lcov",
+			"text",
+			"text-summary"
+		],
+		"include": [
+			"src/controllers/**",
+			"src/routes/**",
+			"src/models/**",
+			"src/services/**",
+			"src/utils/**"
+		],
+		"exclude": [
+			"test/**",
+			"src/middlewares/**",
+			"src/index.js",
+			"src/data/**"
+		],
+		"check-coverage": true,
+		"branches": 90,
+		"functions": 90,
+		"lines": 90,
+		"statements": 90
+	},
+	"devDependencies": {
+		"@eslint/js": "^9.8.0",
+		"c8": "^10.1.2",
+		"chai": "^5.1.1",
+		"eslint": "^9.8.0",
+		"eslint-plugin-node": "^11.1.0",
+		"globals": "^15.9.0",
+		"husky": "^9.1.4",
+		"lint-staged": "^15.2.8",
+		"mocha": "^10.7.0",
+		"prettier": "^3.3.3",
+		"sinon": "^18.0.0",
+		"supertest": "^7.0.0",
+		"swagger-autogen": "^2.23.7",
+		"swagger-ui-express": "^5.0.0"
+	}
+}

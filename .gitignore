@@ -1,0 +1,9 @@
+/node_modules
+package-lock.json
+
+# ADD .ENV FILE !!
+.env
+.env.dev
+/.nyc_output
+/coverage
+.DS_Store

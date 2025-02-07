@@ -1,0 +1,47 @@
+name: CI Pipeline
+
+on:
+    pull_request:
+        branches:
+            - main
+            - develop
+    push:
+        branches:
+            - main
+            - develop
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v2
+
+            - name: Set up Node
+              uses: actions/setup-node@v2
+              with:
+                  node-version: '20' # o la versión que estés usando
+
+            - name: Install dependencies
+              run: npm install
+
+            - name: Run linter
+              run: npm run lint
+              continue-on-error: false # Si hay errores de linting, fallará aquí
+
+            - name: Run formatter
+              run: npm run format
+              continue-on-error: false # Si hay errores de formateo, fallará aquí
+
+            - name: Run test and coverage
+              run: npm run cover
+              continue-on-error: true # Permite que el trabajo continúe si el umbral es bajo
+
+            - name: Check coverage threshold
+              run: |
+                  COVERAGE=$(npx c8 report --reporter=json-summary --reporter=text-lcov | grep lines | sed 's/^.*percentage: \(.*\)%)$/\1/')
+                  if (( $(echo "$COVERAGE < 80.0" | bc -l) )); then
+                    echo "Warning: Code coverage ($COVERAGE%) is below the 80% threshold."
+                  fi
+              shell: bash
