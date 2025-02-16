@@ -1,3 +1,4 @@
+import Diet from './Diet.model.js';
 import Fat from './Fat.model.js';
 import Muscle from './Muscle.model.js';
 import User from './User.model.js';
@@ -67,6 +68,18 @@ export const defineAssociations = async () => {
 	VisceralFat.belongsTo(User, {
 		foreignKey: 'userId',
 		as: 'user',
+		allowNull: false,
+		onDelete: 'CASCADE',
+	});
+	Diet.belongsTo(User, {
+		foreignKey: 'userId',
+		as: 'user',
+		allowNull: false,
+		onDelete: 'CASCADE',
+	});
+	User.hasMany(Diet, {
+		foreignKey: 'userId',
+		as: 'diet',
 		allowNull: false,
 		onDelete: 'CASCADE',
 	});

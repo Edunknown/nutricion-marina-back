@@ -41,3 +41,24 @@ export const formatDate = date => {
 	const month = monthNames[d.getMonth()];
 	return `${day} - ${month}`;
 };
+
+export const formatDietDate = date => {
+	const d = new Date(date);
+	const day = d.getDate();
+	const monthNames = [
+		'Enero',
+		'Febrero',
+		'Marzo',
+		'Abril',
+		'Mayo',
+		'Junio',
+		'Julio',
+		'Agosto',
+		'Septiembre',
+		'Octubre',
+		'Noviembre',
+		'Diciembre',
+	];
+	const month = monthNames[d.getMonth()];
+	return `${day} ${month}`;
+};

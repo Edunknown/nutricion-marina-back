@@ -2,13 +2,7 @@ import { Op } from 'sequelize';
 import { LogError } from '../utils/Logs.js';
 import { checkHash, createHash } from '../utils/Passwords.js';
 import { cleanUser } from '../utils/User.utils.js';
-import Weight from '../database/models/Weight.model.js';
-import Fat from '../database/models/Fat.model.js';
-import VisceralFat from '../database/models/VisceralFat.model.js';
-import Water from '../database/models/Water.model.js';
-import Muscle from '../database/models/Muscle.model.js';
 import User from '../database/models/User.model.js';
-import { formatDate } from '../utils/Dates.js';
 
 /**
  * @name getUserPasswordService
@@ -75,67 +69,10 @@ export const getFullUserService = async userId => {
 
 const getOneUserInfo = async userId => {
 	try {
-		const associations = [
-			{
-				model: Weight,
-				as: 'weights',
-				attribute: 'weight',
-			},
-			{
-				model: Fat,
-				as: 'fats',
-				attribute: 'fat',
-			},
-			{
-				model: VisceralFat,
-				as: 'visceralFats',
-				attribute: 'visceralFat',
-			},
-			{
-				model: Water,
-				as: 'waters',
-				attribute: 'water',
-			},
-			{
-				model: Muscle,
-				as: 'muscles',
-				attribute: 'muscle',
-			},
-		];
+		const user = await User.findByPk(userId);
+		if (!user) return false;
 
-		// Se incluye también el campo 'createdAt'
-		const includeOptions = associations.map(({ model, as, attribute }) => ({
-			model,
-			as,
-			attributes: [attribute, 'createdAt'],
-			where: { deletedAt: null },
-			order: [['createdAt', 'DESC']],
-			required: false,
-		}));
-
-		const user = await User.findByPk(userId, {
-			include: includeOptions,
-		});
-
-		const userJson = user.toJSON();
-
-		// Para cada asociación definida, transformar el array de objetos
-		// a un array de objetos que incluyen el valor y la fecha formateada.
-		associations.forEach(({ as, attribute }) => {
-			if (Array.isArray(userJson[as])) {
-				const values = [];
-				const dates = [];
-
-				userJson[as].forEach(item => {
-					values.push(item[attribute]);
-					dates.push(formatDate(item.createdAt));
-				});
-
-				userJson[as] = { values, dates };
-			}
-		});
-
-		return userJson;
+		return user;
 	} catch (err) {
 		LogError('🚀 ~ getOneUserInfo ~ err:', err);
 		return false;

@@ -16,6 +16,7 @@ import compression from 'compression';
 // Rutas
 import UtilityRoutes from './routes/Utils.routes.js';
 import userRoutes from './routes/User.routes.js';
+import dietRoutes from './routes/Diet.routes.js';
 
 // Utils
 import { DOCS_OUTPUT_FILE } from './data/API_DOCS_INFO.js';
@@ -75,6 +76,7 @@ app.use(express.urlencoded({ limit: '2048mb', extended: true }));
 
 // Add more routes here
 app.use('/user', userRoutes);
+app.use('/diet', dietRoutes);
 
 // Swagger Docs
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(DOCS_OUTPUT_FILE));

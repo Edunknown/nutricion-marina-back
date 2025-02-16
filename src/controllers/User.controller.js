@@ -2,6 +2,12 @@ import Users from '../database/models/User.model.js';
 import Response from '../helpers/Response.helper.js';
 import { LogError } from '../utils/Logs.js';
 import UsersService from '../services/Users.service.js';
+import WeightService from '../services/Weight.service.js';
+import MuscleService from '../services/Muscle.service.js';
+import WaterService from '../services/Water.service.js';
+import FatService from '../services/Fat.service.js';
+import VisceralFatService from '../services/VisceralFat.service.js';
+import DietService from '../services/Diet.service.js';
 
 /**
  * @name getAllUsers
@@ -90,10 +96,27 @@ const getUserById = async (req, res) => {
 	try {
 		const { id } = req.params;
 		console.log('🚀 ~ getUserById ~ id:', id);
-		const user = await UsersService.getOneUserInfo(id);
-		console.log('🚀 ~ getUserById ~ user:', user);
+		const [user, weights, muscles, waters, fats, visceralFats, diets] =
+			await Promise.all([
+				UsersService.getOneUserInfo(id),
+				WeightService.getUserWeights(id),
+				MuscleService.getUserMuscles(id),
+				WaterService.getUserWaters(id),
+				FatService.getUserFats(id),
+				VisceralFatService.getUserVisceralFats(id),
+				DietService.getUserDiets(id),
+			]);
+		console.log('🚀 ~ getUserById ~ weights:', weights);
 		if (!user) return response.ko('Usuario no encontrado');
-		return response.ok('Usuario encontrado', user);
+		return response.ok('Usuario encontrado', {
+			user,
+			weights,
+			muscles,
+			waters,
+			fats,
+			visceralFats,
+			diets,
+		});
 	} catch (err) {
 		LogError('🚀 ~ getUserById ~ err:', err);
 		return response.ko('Error obteniendo usuario');
