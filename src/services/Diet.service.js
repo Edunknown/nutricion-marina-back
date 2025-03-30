@@ -32,9 +32,7 @@ const getDietById = async dietId => {
 
 		if (!diet) return false;
 
-		console.log('🚀 ~ diet:', diet.dataValues);
 		const sanitizedDiet = sanitizeDiet(diet);
-		console.log('🚀 ~ sanitizedDiet:', sanitizedDiet);
 
 		return sanitizedDiet;
 	} catch (err) {

@@ -4,7 +4,7 @@ import db from '../config/Database.js';
 /**
  * @file Muscle.model.js
  * @description Sequelize model for muscle table relation in database
- * @author Eduardo Ruiz Moreno - @Eduknown
+ * @author Eduardo Ruiz Moreno - @Edunknown
  */
 
 const Muscle = db.define(

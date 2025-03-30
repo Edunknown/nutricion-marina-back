@@ -1,4 +1,3 @@
-import Users from '../database/models/User.model.js';
 import Response from '../helpers/Response.helper.js';
 import { LogError } from '../utils/Logs.js';
 import UsersService from '../services/Users.service.js';
@@ -8,19 +7,21 @@ import WaterService from '../services/Water.service.js';
 import FatService from '../services/Fat.service.js';
 import VisceralFatService from '../services/VisceralFat.service.js';
 import DietService from '../services/Diet.service.js';
+import { sanitizeAdminUserData } from '../utils/User.utils.js';
 
 /**
  * @name getAllUsers
  * @description Get all user information from the database
  * @returns {Array} a list of users with the information provided in the database.
- * @author Eduardo Ruiz Moreno - @Eduknown
+ * @author Eduardo Ruiz Moreno - @Edunknown
  */
 
 const getAllUsers = async (req, res) => {
 	const response = new Response(res);
 	try {
-		const users = await Users.findAll();
-		return response.ok('Usuarios encontrados', users);
+		const { search } = req.query;
+		const users = await UsersService.getAllUsers(search);
+		return response.encodedOk('Usuarios encontrados', users);
 	} catch (err) {
 		LogError('🚀 ~ getAllUsers ~ err:', err);
 		return response.ko('Error obteniendo usuarios');
@@ -34,14 +35,13 @@ const getAllUsers = async (req, res) => {
  * @param {String} password The password of the user provided by the front
  * @returns {Object} user in the case the login is successful
  * @returns {Boolean} false in the case the login is not successful
- * @author Eduardo Ruiz Moreno - @Eduknown
+ * @author Eduardo Ruiz Moreno - @Edunknown
  */
 
 const login = async (req, res) => {
 	const response = new Response(res);
 	try {
 		const { email, password } = req.body;
-		console.log('🚀 ~ login ~ email:', email);
 
 		const user = await UsersService.login({ email, password });
 		if (!user) return response.ko('Usuario no encontrado');
@@ -62,7 +62,7 @@ const login = async (req, res) => {
  * @returns {Boolean} false in the case the user is not registered
  * @returns {Boolean} false in the case the user is deleted
  * @returns {Boolean} false in the case the user is not found
- * @authro Eduardo Ruiz Moreno - @Eduknown
+ * @authro Eduardo Ruiz Moreno - @Edunknown
  */
 
 const register = async (req, res) => {
@@ -88,14 +88,13 @@ const register = async (req, res) => {
  * @returns {Boolean} false in the case the user is not found
  * @returns {Boolean} false in the case the user is deleted
  * @returns {Boolean} false in the case the user is not found
- * @author Eduardo Ruiz Moreno - @Eduknown
+ * @author Eduardo Ruiz Moreno - @Edunknown
  */
 
 const getUserById = async (req, res) => {
 	const response = new Response(res);
 	try {
 		const { id } = req.params;
-		console.log('🚀 ~ getUserById ~ id:', id);
 		const [user, weights, muscles, waters, fats, visceralFats, diets] =
 			await Promise.all([
 				UsersService.getOneUserInfo(id),
@@ -106,7 +105,6 @@ const getUserById = async (req, res) => {
 				VisceralFatService.getUserVisceralFats(id),
 				DietService.getUserDiets(id),
 			]);
-		console.log('🚀 ~ getUserById ~ weights:', weights);
 		if (!user) return response.ko('Usuario no encontrado');
 		return response.ok('Usuario encontrado', {
 			user,
@@ -123,4 +121,23 @@ const getUserById = async (req, res) => {
 	}
 };
 
-export default { getAllUsers, login, register, getUserById };
+const getAdminUserInfo = async (req, res) => {
+	const response = new Response(res);
+	try {
+		const { userId } = req.params;
+		if (!userId) return response.ko('Usuario no encontrado');
+
+		const user = await UsersService.getAdminUserInfo(userId);
+		if (!user) return response.ko('Usuario no encontrado');
+
+		const sanitizedData = sanitizeAdminUserData(user);
+		if (!sanitizedData) return response.ko('Error obteniendo usuario');
+
+		return response.encodedOk('Información de usuario', sanitizedData);
+	} catch (err) {
+		LogError('🚀 ~ getAdminUserInfo ~ err:', err);
+		return response.ko('Error obteniendo usuario');
+	}
+};
+
+export default { getAllUsers, login, register, getUserById, getAdminUserInfo };

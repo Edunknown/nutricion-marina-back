@@ -9,7 +9,6 @@ import Response from '../helpers/Response.helper.js';
 const autoDecodeToken = async (req, res, next) => {
 	const response = new Response(res);
 	const { token } = req.body;
-	console.log('🚀 ~ autoDecodeToken ~ token:', token);
 
 	// Check if token exists
 	if (!token) return response.ko('Token is required');

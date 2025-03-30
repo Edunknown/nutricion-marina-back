@@ -4,7 +4,7 @@ import db from '../config/Database.js';
 /**
  * @file Weight.model.js
  * @description Sequelize model for fat table relation in database
- * @author Eduardo Ruiz Moreno - @Eduknown
+ * @author Eduardo Ruiz Moreno - @Edunknown
  */
 
 const Fat = db.define(

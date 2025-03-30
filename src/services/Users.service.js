@@ -1,8 +1,43 @@
 import { Op } from 'sequelize';
 import { LogError } from '../utils/Logs.js';
 import { checkHash, createHash } from '../utils/Passwords.js';
-import { cleanUser } from '../utils/User.utils.js';
+import { cleanUser, sanitizeUserDataArray } from '../utils/User.utils.js';
 import User from '../database/models/User.model.js';
+import Diet from '../database/models/Diet.model.js';
+import DataEntrance from '../database/models/DataEntrance.js';
+
+/**
+ * @name getAllUsers
+ * @description Get all user information from the database
+ * @returns {Array} a list of users with the information provided in the database.
+ * @returns {Boolean} false in the case the users are not found
+ * @author Eduardo Ruiz Moreno - @Edunknown
+ */
+
+export const getAllUsers = async search => {
+	const whereClause = {
+		role: 'user',
+		...(search && {
+			[Op.or]: [
+				{ nombre: { [Op.like]: `%${search}%` } },
+				{ email: { [Op.like]: `%${search}%` } },
+				{ dni: { [Op.like]: `%${search}%` } },
+				{ telefono: { [Op.like]: `%${search}%` } },
+			],
+		}),
+	};
+	try {
+		const users = await User.findAll({
+			where: whereClause,
+			exclude: ['password', 'createdAt', 'updatedAt', 'deletedAt'],
+		});
+		if (!users) return [];
+		return sanitizeUserDataArray(users);
+	} catch (err) {
+		LogError('🚀 ~ getAllUsers ~ err:', err);
+		return false;
+	}
+};
 
 /**
  * @name getUserPasswordService
@@ -64,7 +99,7 @@ export const getFullUserService = async userId => {
  * @returns {Object} user - The user information provided by the database
  * @returns {Boolean} false - In the case the user is not found
  * @returns {Boolean} false - In the case the user is deleted
- * @author Eduardo Ruiz Moreno - @Eduknown
+ * @author Eduardo Ruiz Moreno - @Edunknown
  */
 
 const getOneUserInfo = async userId => {
@@ -86,7 +121,7 @@ const getOneUserInfo = async userId => {
  * @returns {Object} User - The user information provided by the database
  * @returns {Boolean} false - In the case the user is not found
  * @returns {Boolean} false - In the case the user is deleted
- * @author Eduardo Ruiz Moreno - @Eduknown
+ * @author Eduardo Ruiz Moreno - @Edunknown
  **/
 
 export const getOneUserByEmail = async email => {
@@ -111,23 +146,20 @@ export const getOneUserByEmail = async email => {
  * @param {String} password The password of the user provided by the front
  * @returns {Object} user in the case the login is successful
  * @returns {Boolean} false in the case the login is not successful
- * @author Eduardo Ruiz Moreno - @Eduknown
+ * @author Eduardo Ruiz Moreno - @Edunknown
  */
 
 export const login = async ({ email, password }) => {
 	try {
 		const user = await getOneUserByEmail(email);
-		console.log('🚀 ~ login ~ user:', user);
 		if (!user) return false;
 
 		if (user.deletedAt) return false;
 
 		const isPasswordCorrect = await checkHash(password, user.password);
-		console.log('🚀 ~ login ~ isPasswordCorrect:', isPasswordCorrect);
 		if (!isPasswordCorrect) return false;
 
 		const cleanedUser = cleanUser(user);
-		console.log('🚀 ~ login ~ cleanedUser:', cleanedUser);
 
 		return cleanedUser;
 	} catch (err) {
@@ -146,7 +178,7 @@ export const login = async ({ email, password }) => {
  * @returns {Boolean} false in the case the user already exists
  * @returns {Boolean} false in the case the password cannot be hashed
  * @returns {Boolean} false in the case the user cannot be created
- * @author Eduardo Ruiz Moreno - @Eduknown
+ * @author Eduardo Ruiz Moreno - @Edunknown
  */
 
 export const register = async ({ email, password }) => {
@@ -171,10 +203,39 @@ export const register = async ({ email, password }) => {
 	}
 };
 
+export const getAdminUserInfo = async userId => {
+	try {
+		const user = await User.findByPk(userId, {
+			include: [
+				{
+					model: Diet,
+					as: 'diet',
+					attributes: ['dietId', 'userId', 'createdAt'],
+				},
+				{
+					model: DataEntrance,
+					as: 'dataEntrances',
+				},
+			],
+			order: [
+				['diet', 'createdAt', 'DESC'],
+				['dataEntrances', 'createdAt', 'DESC'],
+			],
+		});
+		if (!user) return false;
+		return user;
+	} catch (err) {
+		LogError('🚀 ~ getAdminUserInfo ~ err:', err);
+		return false;
+	}
+};
+
 export default {
 	getUserPasswordService,
 	getFullUserService,
 	login,
 	register,
 	getOneUserInfo,
+	getAllUsers,
+	getAdminUserInfo,
 };

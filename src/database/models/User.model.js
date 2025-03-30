@@ -26,6 +26,16 @@ const User = db.define(
 			allowNull: false,
 			unique: true,
 		},
+		dni: {
+			type: DataTypes.STRING,
+			allowNull: true,
+			defaultValue: null,
+		},
+		telefono: {
+			type: DataTypes.STRING,
+			allowNull: true,
+			defaultValue: null,
+		},
 		password: {
 			type: DataTypes.STRING,
 			allowNull: false,

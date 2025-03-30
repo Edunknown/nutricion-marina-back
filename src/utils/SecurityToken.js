@@ -44,7 +44,6 @@ export const decodePayload = data => {
  *
  */
 export const encodeToken = data => {
-	console.log('🚀 ~ data:', data);
 	data = encodePayload(data);
 	const encodeToken = jwt.sign(
 		{
@@ -70,7 +69,6 @@ export const encodeToken = data => {
 export const decodeToken = token => {
 	try {
 		const { data } = jwt.verify(token, JWT_SECRET);
-		console.log('🚀 ~ data:', data);
 		return decodePayload(data);
 	} catch (error) {
 		LogError('decodeToken', error);

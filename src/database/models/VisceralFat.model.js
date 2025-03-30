@@ -4,7 +4,7 @@ import db from '../config/Database.js';
 /**
  * @file Weight.model.js
  * @description Sequelize model for visceral fat table relation in database
- * @author Eduardo Ruiz Moreno - @Eduknown
+ * @author Eduardo Ruiz Moreno - @Edunknown
  */
 
 const VisceralFat = db.define(

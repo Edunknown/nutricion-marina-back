@@ -1,3 +1,4 @@
+import DataEntrance from './DataEntrance.js';
 import Diet from './Diet.model.js';
 import Fat from './Fat.model.js';
 import Muscle from './Muscle.model.js';
@@ -80,6 +81,18 @@ export const defineAssociations = async () => {
 	User.hasMany(Diet, {
 		foreignKey: 'userId',
 		as: 'diet',
+		allowNull: false,
+		onDelete: 'CASCADE',
+	});
+	User.hasMany(DataEntrance, {
+		foreignKey: 'userId',
+		as: 'dataEntrances',
+		allowNull: false,
+		onDelete: 'CASCADE',
+	});
+	DataEntrance.belongsTo(User, {
+		foreignKey: 'userId',
+		as: 'user',
 		allowNull: false,
 		onDelete: 'CASCADE',
 	});
